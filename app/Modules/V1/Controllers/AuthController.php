@@ -13,7 +13,7 @@ class AuthController
     {
         $postVars = $request->getPostVars();
         $email = $postVars["email"] ?? "";
-        $cpf = $postVars["cpf"] ?? "";
+        $senha = $postVars["senha"] ?? "";
 
         $errosCampos = [];
         if ($email == "") {
@@ -22,13 +22,8 @@ class AuthController
             $errosCampos[] = ["nome" => "email", "mensagem" => "Email inválido"];
         }
         
-        if ($cpf == "") {
-            $errosCampos[] = ["nome" => "cpf", "mensagem" => "CPF é obrigatório"];
-        } else {
-            $cpf = Mask::remove($cpf);
-            if (!Validate::cpf($cpf)) {
-                $errosCampos[] = ["nome" => "cpf", "mensagem" => "CPF inválido"];
-            }
+        if ($senha == "") {
+            $errosCampos[] = ["nome" => "senha", "mensagem" => "Senha é obrigatório"];
         }
         
         if (!empty($errosCampos)) {
@@ -38,8 +33,10 @@ class AuthController
             ]);
         }
 
+        $senhaHash = hash("sha256", $senha);
+
         $usuario = new Usuario();
-        $rsUsuario = $usuario->select("id")->whereRaw("email='$email' AND cpf='$cpf'")->fetch();
+        $rsUsuario = $usuario->select("id")->whereRaw("email='$email' AND senha='$senhaHash'")->fetch();
         if (empty($rsUsuario)) {
             return $response->status(404)->send([
                 "codigo" => "recurso_nao_encontrado",
@@ -52,7 +49,6 @@ class AuthController
         //Payload - Content
         $payload = [
             'id' => $rsUsuario['id'],
-            'cpf' => $cpf,
             'email' => $email,
         ];
 
