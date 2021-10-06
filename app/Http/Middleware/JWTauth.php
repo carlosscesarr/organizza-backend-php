@@ -33,9 +33,8 @@ class JWTauth {
         }
 
         $email = $decoded["email"] ?? "";
-        $cpf = $decoded["cpf"] ?? "";
         $id = $decoded["id"] ?? "";
-        if (empty($email) || empty($cpf) || empty($id)) {
+        if (empty($email) || empty($id)) {
             return false;
         }
         

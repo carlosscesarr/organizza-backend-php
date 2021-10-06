@@ -4,7 +4,6 @@ namespace App\Modules\V1\Controllers;
 
 use Firebase\JWT\JWT;
 use Core\Validate;
-use Core\Mask;
 use App\Modules\V1\Models\Usuario;
 
 class AuthController
