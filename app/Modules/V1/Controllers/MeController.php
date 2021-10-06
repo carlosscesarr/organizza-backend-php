@@ -23,7 +23,7 @@ class MeController
         $decoded = (array) JWT::decode($jwt, $key, array('HS256'));
         $usuarioId = $decoded["id"];
 
-        $data = $this->usuario->select("id, nome, email, cpf, data_cadastro, data_atualizacao")->whereRaw("id = $usuarioId")->fetch();
+        $data = $this->usuario->select("id, nome, email, data_cadastro, data_atualizacao")->whereRaw("id = $usuarioId")->fetch();
 
         if (empty($data)) {
             return $response->status(404)->send(["mensagem" => "Nenhum registro foi encontrado"]);
@@ -44,7 +44,7 @@ class MeController
         $dataUpdate["data_atualizacao"] = date("Y-m-d H:i:s");
         $nome = $dataUpdate["nome"] ?? "";
         $email = $dataUpdate["email"] ?? "";
-        $cpf = $dataUpdate["cpf"] ?? "";
+        $senha = $dataUpdate["senha"] ?? "";
         $ativo = $dataUpdate["ativo"] ?? "";
         $usuarioId = $decoded["id"];
         
@@ -62,20 +62,6 @@ class MeController
             $buscaUsuarioEmail = $this->usuario->select("id")->whereRaw("email = '$email' AND id <> $usuarioId")->fetch();
             if (!empty($buscaUsuarioEmail)) {
                 $errosCampos[] = ["nome" => "email", "mensagem" => "Email já existe"];
-            }
-        }
-
-        if ($cpf == "") {
-            $errosCampos[] = ["cpf" => "cpf", "mensagem" => "CPF é obrigatório"];
-        } else {
-            $cpf = Mask::remove($cpf);
-            if (!Validate::cpf($cpf)) {
-                $errosCampos[] = ["nome" => "cpf", "mensagem" => "CPF inválido"];
-            } else {
-                $buscaUsuarioCpf = $this->usuario->select("id")->whereRaw("cpf = '$cpf' AND id <> $usuarioId")->fetch();
-                if (!empty($buscaUsuarioCpf)) {
-                    $errosCampos[] = ["nome" => "cpf", "mensagem" => "Cpf já existe"];
-                }
             }
         }
 

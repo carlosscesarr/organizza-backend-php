@@ -20,7 +20,7 @@ class UsuariosController
         $dataInsert = $request->getPostVars();
         $nome = $dataInsert["nome"] ?? "";
         $email = $dataInsert["email"] ?? "";
-        $cpf = $dataInsert["cpf"] ?? "";
+        $senha = $dataInsert["senha"] ?? "";
         $ativo = $dataInsert["ativo"] ?? "";
 
         $errosCampos = [];
@@ -41,19 +41,8 @@ class UsuariosController
             }
         }
 
-        if ($cpf == "") {
-            $errosCampos[] = ["cpf" => "cpf", "mensagem" => "CPF é obrigatório"];
-        } else {
-            $cpf = Mask::remove($cpf);
-            $dataInsert["cpf"] = $cpf;
-            if (!Validate::cpf($cpf)) {
-                $errosCampos[] = ["nome" => "cpf", "mensagem" => "CPF inválido"];
-            } else {
-                $buscaUsuarioCpf = $this->usuario->select("id")->whereRaw("cpf = '$cpf'")->fetch();
-                if (!empty($buscaUsuarioCpf)) {
-                    $errosCampos[] = ["nome" => "cpf", "mensagem" => "Cpf já existe"];
-                }
-            }
+        if ($senha == "") {
+            $errosCampos[] = ["senha" => "senha", "mensagem" => "Senha é obrigatório"];
         }
        
         if (!empty($errosCampos)) {
@@ -63,6 +52,7 @@ class UsuariosController
             ]);
         }
 
+        $dataInsert["senha"] = hash("sha256", $senha);
         $insertUsuario = $this->usuario->insert($dataInsert);
         if ($insertUsuario) {
             $dataInsert["id"] = $this->usuario->lastInsertId();
