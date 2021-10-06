@@ -1,4 +1,5 @@
 <?php
+include __DIR__.'/includes/cors.php';
 include __DIR__.'/includes/app.php';
 
 use App\Config;
