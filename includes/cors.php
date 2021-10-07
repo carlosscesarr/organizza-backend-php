@@ -8,6 +8,7 @@ function cors() {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: X-Requested-With, Content-Type, Origin, Authorization, Accept");
         header('Access-Control-Allow-Credentials: true');
+        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
         header('Access-Control-Max-Age: 86400');    // cache for 1 day
     }
     
