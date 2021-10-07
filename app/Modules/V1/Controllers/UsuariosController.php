@@ -3,6 +3,8 @@ namespace App\Modules\V1\Controllers;
 
 use Firebase\JWT\JWT;
 use App\Modules\V1\Models\Usuario;
+use App\Modules\V1\Models\Categoria;
+use Core\Database;
 use Core\Validate;
 use Core\Mask;
 
@@ -51,14 +53,62 @@ class UsuariosController
                 "campos" => $errosCampos
             ]);
         }
-
+        $con = Database::getInstance();
+        $con->autocommit(false);
         $dataInsert["senha"] = hash("sha256", $senha);
         $insertUsuario = $this->usuario->insert($dataInsert);
-        if ($insertUsuario) {
-            $dataInsert["id"] = $this->usuario->lastInsertId();
+        if (!$insertUsuario) {
+            return $response->status(500)->send(["erro" => true, "mensagem" => "Falha interna"]);
+        }
+
+        $dataInsert["id"] = $this->usuario->lastInsertId();
+
+        $dataInsertCategoriasPadrao = [
+            [
+                "usuario_id" => $dataInsert["id"],
+                "descricao" => "Outros",
+                "tipo_categoria" => "DESPESA"
+            ],
+            [
+                "usuario_id" => $dataInsert["id"],
+                "descricao" => "Casa",
+                "tipo_categoria" => "DESPESA"
+            ],
+            [
+                "usuario_id" => $dataInsert["id"],
+                "descricao" => "Educação",
+                "tipo_categoria" => "DESPESA"
+            ],
+            [
+                "usuario_id" => $dataInsert["id"],
+                "descricao" => "Saúde",
+                "tipo_categoria" => "DESPESA"
+            ],
+            [
+                "usuario_id" => $dataInsert["id"],
+                "descricao" => "Alimentação",
+                "tipo_categoria" => "DESPESA"
+            ],
+            [
+                "usuario_id" => $dataInsert["id"],
+                "descricao" => "Transporte",
+                "tipo_categoria" => "DESPESA"
+            ],
+            [
+                "usuario_id" => $dataInsert["id"],
+                "descricao" => "Outros",
+                "tipo_categoria" => "RECEITA"
+            ],
+        ];
+
+        $categoria = new Categoria();
+        $insertCategoriasPadrao = $categoria->insert($dataInsertCategoriasPadrao);
+        if ($insertCategoriasPadrao) {
+            $con->commit();
             return $response->status(201)->send($dataInsert);
         }
 
+        $con->rollback();
         return $response->status(500)->send(["erro" => true, "mensagem" => "Falha interna"]);
     }
 

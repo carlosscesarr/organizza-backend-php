@@ -29,7 +29,10 @@ class Config
         self::$dbCharset  = 'utf8';
         
         self::$appFolder       = "organizza";
-        self::$baseUrl         = "http://localhost/" . self::$appFolder;
+        self::$baseUrl         = "http://localhost";
+        if (self::$appFolder != "") {
+            self::$baseUrl .= "/" . self::$appFolder;
+        }
         self::$siteAssets      = self::$baseUrl . "/public";
         
         self::$displayErrors = true;
